@@ -8,7 +8,7 @@ git clone https://github.com/Cobra800089/troonChecker.git
 ```
 2. Install the dependancies
 ```
-mod init github.com/Cobra800089/troonChecker
+go get ./...
 ```
 3. Fill in the required Twilio phone numbers and keys
 4. go run main.go
