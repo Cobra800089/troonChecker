@@ -1,4 +1,4 @@
-<h3 align="center">Troon Checker and SMS Sender</h3>
+<h3 align="center">Troon Checker and Discord Message Sender</h3>
 
 <!-- GETTING STARTED -->
 
@@ -10,7 +10,7 @@ git clone https://github.com/Cobra800089/troonChecker.git
 ```
 go get ./...
 ```
-3. Fill in the required Twilio phone numbers and keys
+3. Fill in the required Discord Webhook and discord_role_id of the Discord Role you'd like to @
 4. go run main.go
 
 
