@@ -14,7 +14,8 @@ import (
 var cdnUrl = "https://cdn5.editmysite.com/app/store/api/v28/editor/users/131270493/sites/827516815791883917/products"
 var username = "TroonBot"
 var discordWebhookURL = ""
-var discord_role_id = ""
+var discord_listing_role_id = ""
+var discord_sale_role_id = ""
 
 type troonData struct {
 	Data []struct {
