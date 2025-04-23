@@ -10,8 +10,12 @@ git clone https://github.com/Cobra800089/troonChecker.git
 ```
 go get ./...
 ```
-3. Fill in the required Discord Webhook and discord_role_id of the Discord Role you'd like to @
-4. go run main.go
+3. Fill in the required Discord Webhook
+4. Fill in the required discord_listing_role_id (role_id of the role you want to @ when a beer gets listed)
+5. Fill in the required discord_sale_role_id (role_id of the role you want to @ when a beer goes up for sale)
+6. go run main.go
+
+(You can also build the executable with `go build` and run `troonChecker` directly.
 
 
 MIT License
