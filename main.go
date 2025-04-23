@@ -157,6 +157,7 @@ type troonData struct {
 }
 
 func main() {
+	previousBeers := []string{}
 	previousBeersURL := []string{}
 	var beerUrl = ""
 	var content = ""
@@ -201,6 +202,7 @@ func main() {
 			for i := 0; i < len(beer_list.Data); i++ {
 				//check to make sure we aren't alerting for the same beer
 				if ! slices.Contains(previousBeers, beer_list.Data[i].Name) {
+					previousBeers = append(previousBeers, beer_list.Data[i].Name)
 					previousBeersURL = append(previousBeersURL, beer_list.Data[i].AbsoluteSiteLink)
 					beerUrl = beer_list.Data[i].AbsoluteSiteLink
 					content = "<@&" + discord_listing_role_id + "> "+ beer_list.Data[i].Name + " was just listed. (For sale probably later today.)"
