@@ -11,11 +11,10 @@ import (
 	"strings"
 )
 
-var cdnUrl = "https://cdn5.editmysite.com/app/store/api/v16/editor/users/131270493/sites/827516815791883917/products"
+var cdnUrl = "https://cdn5.editmysite.com/app/store/api/v28/editor/users/131270493/sites/827516815791883917/products"
 var username = "TroonBot"
 var discordWebhookURL = ""
-var discord_listing_role_id = ""
-var discord_sale_role_id = ""
+var discord_role_id = ""
 
 type troonData struct {
 	Data []struct {
@@ -158,7 +157,6 @@ type troonData struct {
 }
 
 func main() {
-	previousBeers := []string{}
 	previousBeersURL := []string{}
 	var beerUrl = ""
 	var content = ""
@@ -203,7 +201,6 @@ func main() {
 			for i := 0; i < len(beer_list.Data); i++ {
 				//check to make sure we aren't alerting for the same beer
 				if ! slices.Contains(previousBeers, beer_list.Data[i].Name) {
-					previousBeers = append(previousBeers, beer_list.Data[i].Name)
 					previousBeersURL = append(previousBeersURL, beer_list.Data[i].AbsoluteSiteLink)
 					beerUrl = beer_list.Data[i].AbsoluteSiteLink
 					content = "<@&" + discord_listing_role_id + "> "+ beer_list.Data[i].Name + " was just listed. (For sale probably later today.)"
