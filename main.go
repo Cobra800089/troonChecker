@@ -208,27 +208,27 @@ func main() {
 					beerUrl = beer_list.Data[i].AbsoluteSiteLink
 					content = "<@&" + discord_listing_role_id + "> "+ beer_list.Data[i].Name + " was just listed. (For sale probably later today.)"
 					message := discordwebhook.Message{
-									Username: &username,
-									Content: &content,
-								}
-							
-								err := discordwebhook.SendMessage(discordWebhookURL, message)
-								if err != nil {
-									log.Fatal(err)
-								}
+						Username: &username,
+						Content: &content,
+					}
+				
+					err := discordwebhook.SendMessage(discordWebhookURL, message)
+					if err != nil {
+						log.Fatal(err)
+					}
 				} else if (strings.Contains(previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)], "filler")) && (! strings.Contains(beer_list.Data[i].AbsoluteSiteLink, "filler")) {
 					beerUrl = beer_list.Data[i].AbsoluteSiteLink
 					previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)] = beerUrl
 					content = "<@&" + discord_sale_role_id + "> "+ beer_list.Data[i].Name + " is now for sale! " + beerUrl
 					message := discordwebhook.Message{
-									Username: &username,
-									Content: &content,
-								}
-							
-								err := discordwebhook.SendMessage(discordWebhookURL, message)
-								if err != nil {
-									log.Fatal(err)
-								}
+						Username: &username,
+						Content: &content,
+					}
+				
+					err := discordwebhook.SendMessage(discordWebhookURL, message)
+					if err != nil {
+						log.Fatal(err)
+					}
 				}
 			}
 		}
