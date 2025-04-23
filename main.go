@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-var cdnUrl = "https://cdn5.editmysite.com/app/store/api/v28/editor/users/152813922/sites/671129435565218039/products"
+var cdnUrl = "https://cdn5.editmysite.com/app/store/api/v16/editor/users/131270493/sites/827516815791883917/products"
 var username = "TroonBot"
 var discordWebhookURL = ""
 var discord_listing_role_id = ""
