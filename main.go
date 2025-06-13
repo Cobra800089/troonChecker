@@ -176,6 +176,17 @@ func main() {
 
         req.Header.Set("User-Agent", "troonChecker")
 
+		// Send discord message to show bot is online
+		content = "Troon Bot is online"
+		message := discordwebhook.Message{
+				Username: &username,
+				Content: &content,
+		}
+		err := discordwebhook.SendMessage(discordWebhookURL, message)
+		if err != nil {
+				log.Println(err)
+		}
+
         // loop forever while doing a check every minute
         for {
                 timer1 := time.NewTimer(time.Second * 60)
@@ -188,10 +199,10 @@ func main() {
                                 Username: &username,
                                 Content: &content,
                         }
-                                err := discordwebhook.SendMessage(discordWebhookURL, message)
-                                if err != nil {
-                                        log.Println(err)
-                                }
+						err := discordwebhook.SendMessage(discordWebhookURL, message)
+						if err != nil {
+								log.Println(err)
+						}
                 }
 
                 if res.Body != nil {
@@ -212,10 +223,10 @@ func main() {
                                 Username: &username,
                                 Content: &content,
                         }
-                                err := discordwebhook.SendMessage(discordWebhookURL, message)
-                                if err != nil {
-                                        log.Println(err)
-                                }
+						err := discordwebhook.SendMessage(discordWebhookURL, message)
+						if err != nil {
+								log.Println(err)
+						}
                 }
                 //check to see if there is a beer for sale
                 if len(beer_list.Data) > 0 {
