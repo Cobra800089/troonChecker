@@ -176,16 +176,16 @@ func main() {
 
         req.Header.Set("User-Agent", "troonChecker")
 
-		// Send discord message to show bot is online
-		content = "Troon Bot is online"
-		message := discordwebhook.Message{
-				Username: &username,
-				Content: &content,
-		}
-		err := discordwebhook.SendMessage(discordWebhookURL, message)
-		if err != nil {
-				log.Println(err)
-		}
+	// Send discord message to show bot is online
+	content = "Troon Bot is online"
+	message := discordwebhook.Message{
+			Username: &username,
+			Content: &content,
+	}
+	err := discordwebhook.SendMessage(discordWebhookURL, message)
+	if err != nil {
+			log.Println(err)
+	}
 
         // loop forever while doing a check every minute
         for {
