@@ -16,6 +16,7 @@ var username = "TroonBot"
 var discordWebhookURL = ""
 var discord_listing_role_id = ""
 var discord_sale_role_id = ""
+var discord_error_user = ""
 
 type troonData struct {
 	Data []struct {
@@ -182,7 +183,7 @@ func main() {
 		res, getErr := beerClient.Do(req)
 		if getErr != nil {
 			log.Println(getErr)
-			content = "<@cobra> Error: " + getErr
+			content = "<@" + discord_error_user + "> Error: " + getErr
 			message := discordwebhook.Message{
 				Username: &username,
 				Content: &content,
@@ -206,7 +207,7 @@ func main() {
 		jsonErr := json.Unmarshal(body, &beer_list)
 		if jsonErr != nil {
 			log.Println(jsonErr)
-			content = "<@cobra> Error: " + jsonErr + "\\n\\nJSON payload contents:\\n" + body
+			content = "<@" + discord_error_user + "> Error: " + jsonErr + "\\n\\nJSON payload contents:\\n" + body
 			message := discordwebhook.Message{
 				Username: &username,
 				Content: &content,
