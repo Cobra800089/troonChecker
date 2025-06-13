@@ -170,7 +170,7 @@ func main() {
 
 	req, err := http.NewRequest(http.MethodGet, cdnUrl, nil)
 	if err != nil {
-		log.print(err)
+		log.Println(err)
 	}
 
 	req.Header.Set("User-Agent", "troonChecker")
@@ -181,7 +181,7 @@ func main() {
 
 		res, getErr := beerClient.Do(req)
 		if getErr != nil {
-			log.print(getErr)
+			log.Println(getErr)
 		}
 
 		if res.Body != nil {
@@ -190,13 +190,13 @@ func main() {
 
 		body, readErr := ioutil.ReadAll(res.Body)
 		if readErr != nil {
-			log.print(readErr)
+			log.Println(readErr)
 		}
 
 		beer_list := troonData{}
 		jsonErr := json.Unmarshal(body, &beer_list)
 		if jsonErr != nil {
-			log.print(jsonErr)
+			log.Println(jsonErr)
 		}
 		//check to see if there is a beer for sale
 		if len(beer_list.Data) > 0 {
@@ -214,7 +214,7 @@ func main() {
 					if startup == 0 {
 						err := discordwebhook.SendMessage(discordWebhookURL, message)
 						if err != nil {
-							log.print(err)
+							log.Println(err)
 						}
 					}
 					previousBeers = append(previousBeers, beer_list.Data[i].Name)
@@ -231,7 +231,7 @@ func main() {
 				
 					err := discordwebhook.SendMessage(discordWebhookURL, message)
 					if err != nil {
-						log.print(err)
+						log.Println(err)
 					}
 				}
 			}
