@@ -165,7 +165,7 @@ func main() {
 	var startup = 1
 
 	beerClient := http.Client{
-		Timeout: time.Second * 2, // Timeout after 2 seconds
+		Timeout: time.Second * 10, // Timeout after 2 seconds
 	}
 
 	req, err := http.NewRequest(http.MethodGet, cdnUrl, nil)
@@ -182,6 +182,15 @@ func main() {
 		res, getErr := beerClient.Do(req)
 		if getErr != nil {
 			log.Println(getErr)
+			content = "<@cobra> Error: " + getErr
+			message := discordwebhook.Message{
+				Username: &username,
+				Content: &content,
+			}
+				err := discordwebhook.SendMessage(discordWebhookURL, message)
+				if err != nil {
+					log.Println(err)
+				}
 		}
 
 		if res.Body != nil {
@@ -197,6 +206,15 @@ func main() {
 		jsonErr := json.Unmarshal(body, &beer_list)
 		if jsonErr != nil {
 			log.Println(jsonErr)
+			content = "<@cobra> Error: " + jsonErr + "\\n\\nJSON payload contents:\\n" + body
+			message := discordwebhook.Message{
+				Username: &username,
+				Content: &content,
+			}
+				err := discordwebhook.SendMessage(discordWebhookURL, message)
+				if err != nil {
+					log.Println(err)
+				}
 		}
 		//check to see if there is a beer for sale
 		if len(beer_list.Data) > 0 {
