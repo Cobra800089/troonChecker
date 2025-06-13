@@ -166,7 +166,7 @@ func main() {
 	var startup = 1
 
 	beerClient := http.Client{
-		Timeout: time.Second * 10, // Timeout after 2 seconds
+		Timeout: time.Second * 10, // Timeout after 10 seconds
 	}
 
 	req, err := http.NewRequest(http.MethodGet, cdnUrl, nil)
