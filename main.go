@@ -199,10 +199,10 @@ func main() {
                                 Username: &username,
                                 Content: &content,
                         }
-                                                err := discordwebhook.SendMessage(discordWebhookURL, message)
-                                                if err != nil {
-                                                                log.Println(err)
-                                                }
+                        err := discordwebhook.SendMessage(discordWebhookURL, message)
+                        if err != nil {
+                                        log.Println(err)
+                        }
                 }
 
                 if res.Body != nil {
@@ -223,10 +223,10 @@ func main() {
                                 Username: &username,
                                 Content: &content,
                         }
-                                                err := discordwebhook.SendMessage(discordWebhookURL, message)
-                                                if err != nil {
-                                                                log.Println(err)
-                                                }
+                        err := discordwebhook.SendMessage(discordWebhookURL, message)
+                        if err != nil {
+                                        log.Println(err)
+                        }
                 }
                 //check to see if there is a beer for sale
                 if len(beer_list.Data) > 0 {
