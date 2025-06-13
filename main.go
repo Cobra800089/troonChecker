@@ -162,6 +162,7 @@ func main() {
 	previousBeersURL := []string{}
 	var beerUrl = ""
 	var content = ""
+	var startup = 1
 
 	beerClient := http.Client{
 		Timeout: time.Second * 2, // Timeout after 2 seconds
@@ -169,7 +170,7 @@ func main() {
 
 	req, err := http.NewRequest(http.MethodGet, cdnUrl, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.print(err)
 	}
 
 	req.Header.Set("User-Agent", "troonChecker")
@@ -180,7 +181,7 @@ func main() {
 
 		res, getErr := beerClient.Do(req)
 		if getErr != nil {
-			log.Fatal(getErr)
+			log.print(getErr)
 		}
 
 		if res.Body != nil {
@@ -189,13 +190,13 @@ func main() {
 
 		body, readErr := ioutil.ReadAll(res.Body)
 		if readErr != nil {
-			log.Fatal(readErr)
+			log.print(readErr)
 		}
 
 		beer_list := troonData{}
 		jsonErr := json.Unmarshal(body, &beer_list)
 		if jsonErr != nil {
-			log.Fatal(jsonErr)
+			log.print(jsonErr)
 		}
 		//check to see if there is a beer for sale
 		if len(beer_list.Data) > 0 {
@@ -203,19 +204,22 @@ func main() {
 			for i := 0; i < len(beer_list.Data); i++ {
 				//check to make sure we aren't alerting for the same beer
 				if ! slices.Contains(previousBeers, beer_list.Data[i].Name) {
-					previousBeers = append(previousBeers, beer_list.Data[i].Name)
-					previousBeersURL = append(previousBeersURL, beer_list.Data[i].AbsoluteSiteLink)
 					beerUrl = beer_list.Data[i].AbsoluteSiteLink
 					content = "<@&" + discord_listing_role_id + "> "+ beer_list.Data[i].Name + " was just listed. (For sale probably later today.)"
 					message := discordwebhook.Message{
 						Username: &username,
 						Content: &content,
 					}
-				
-					err := discordwebhook.SendMessage(discordWebhookURL, message)
-					if err != nil {
-						log.Fatal(err)
+					//don't send a discord alert if the bot is starting up
+					if startup == 0 {
+						err := discordwebhook.SendMessage(discordWebhookURL, message)
+						if err != nil {
+							log.print(err)
+						}
 					}
+					previousBeers = append(previousBeers, beer_list.Data[i].Name)
+					previousBeersURL = append(previousBeersURL, beer_list.Data[i].AbsoluteSiteLink)
+					
 				} else if (strings.Contains(previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)], "filler")) && (! strings.Contains(beer_list.Data[i].AbsoluteSiteLink, "filler")) {
 					beerUrl = beer_list.Data[i].AbsoluteSiteLink
 					previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)] = beerUrl
@@ -227,12 +231,13 @@ func main() {
 				
 					err := discordwebhook.SendMessage(discordWebhookURL, message)
 					if err != nil {
-						log.Fatal(err)
+						log.print(err)
 					}
 				}
 			}
 		}
-		//start the timer
+		//start the timer and turn startup off
 		<-timer1.C
+		startup = 0
 	}
 }
