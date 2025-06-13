@@ -1,22 +1,22 @@
 package main
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"time"
-	"github.com/gtuk/discordwebhook"
-	"slices"
-	"strings"
+        "encoding/json"
+        "io/ioutil"
+        "log"
+        "net/http"
+        "time"
+        "github.com/gtuk/discordwebhook"
+        "slices"
+        "strings"
 )
 
 var cdnUrl = "https://cdn5.editmysite.com/app/store/api/v28/editor/users/131270493/sites/827516815791883917/products"
 var username = "TroonBot"
+var discord_error_user = ""
 var discordWebhookURL = ""
 var discord_listing_role_id = ""
 var discord_sale_role_id = ""
-var discord_error_user = ""
 
 type troonData struct {
         Data []struct {
@@ -176,16 +176,16 @@ func main() {
 
         req.Header.Set("User-Agent", "troonChecker")
 
-	// Send discord message to show bot is online
-	content = "Troon Bot is online"
-	message := discordwebhook.Message{
-			Username: &username,
-			Content: &content,
-	}
-	err := discordwebhook.SendMessage(discordWebhookURL, message)
-	if err != nil {
-			log.Println(err)
-	}
+        // Send discord message to show bot is online
+        content = "Troon bot is online"
+        message := discordwebhook.Message{
+                Username: &username,
+                Content: &content,
+        }
+        discordErr := discordwebhook.SendMessage(discordWebhookURL, message)
+        if discordErr != nil {
+                log.Println(discordErr)
+        }
 
         // loop forever while doing a check every minute
         for {
@@ -199,10 +199,10 @@ func main() {
                                 Username: &username,
                                 Content: &content,
                         }
-						err := discordwebhook.SendMessage(discordWebhookURL, message)
-						if err != nil {
-								log.Println(err)
-						}
+                                                err := discordwebhook.SendMessage(discordWebhookURL, message)
+                                                if err != nil {
+                                                                log.Println(err)
+                                                }
                 }
 
                 if res.Body != nil {
@@ -223,10 +223,10 @@ func main() {
                                 Username: &username,
                                 Content: &content,
                         }
-						err := discordwebhook.SendMessage(discordWebhookURL, message)
-						if err != nil {
-								log.Println(err)
-						}
+                                                err := discordwebhook.SendMessage(discordWebhookURL, message)
+                                                if err != nil {
+                                                                log.Println(err)
+                                                }
                 }
                 //check to see if there is a beer for sale
                 if len(beer_list.Data) > 0 {
