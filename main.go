@@ -2,6 +2,7 @@ package main
 
 import (
         "encoding/json"
+        "fmt"
         "io/ioutil"
         "log"
         "net/http"
@@ -191,81 +192,100 @@ func main() {
         for {
                 timer1 := time.NewTimer(time.Second * 60)
 
-                res, getErr := beerClient.Do(req)
-                if getErr != nil {
-                        log.Println(getErr)
-                        content = "<@" + discord_error_user + "> Error: " + getErr.Error()
-                        message := discordwebhook.Message{
-                                Username: &username,
-                                Content: &content,
-                        }
-                                                err := discordwebhook.SendMessage(discordWebhookURL, message)
-                                                if err != nil {
-                                                                log.Println(err)
-                                                }
-                }
-
-                if res.Body != nil {
-                        defer res.Body.Close()
-                }
-
-                body, readErr := ioutil.ReadAll(res.Body)
-                if readErr != nil {
-                        log.Println(readErr)
-                }
-
-                beer_list := troonData{}
-                jsonErr := json.Unmarshal(body, &beer_list)
-                if jsonErr != nil {
-                        log.Println(jsonErr)
-                        content = "<@" + discord_error_user + "> Error: " + jsonErr.Error() + "\\n\\nJSON payload contents:\\n" + string(body[:])
-                        message := discordwebhook.Message{
-                                Username: &username,
-                                Content: &content,
-                        }
-                                                err := discordwebhook.SendMessage(discordWebhookURL, message)
-                                                if err != nil {
-                                                                log.Println(err)
-                                                }
-                }
-                //check to see if there is a beer for sale
-                if len(beer_list.Data) > 0 {
-                        //loop through all beers in the list
-                        for i := 0; i < len(beer_list.Data); i++ {
-                                //check to make sure we aren't alerting for the same beer
-                                if ! slices.Contains(previousBeers, beer_list.Data[i].Name) {
-                                        beerUrl = beer_list.Data[i].AbsoluteSiteLink
-                                        content = "<@&" + discord_listing_role_id + "> "+ beer_list.Data[i].Name + " was just listed. (For sale probably later today.)"
+                // recover unexpected panics per-iteration
+                func() {
+                        defer func() {
+                                if r := recover(); r != nil {
+                                        log.Println("panic during request loop:", r)
+                                        content = "<@" + discord_error_user + "> Error: panic during request loop: " + fmt.Sprint(r)
                                         message := discordwebhook.Message{
                                                 Username: &username,
                                                 Content: &content,
                                         }
-                                        //don't send a discord alert if the bot is starting up
-                                        if startup == 0 {
-                                                err := discordwebhook.SendMessage(discordWebhookURL, message)
-                                                if err != nil {
-                                                        log.Println(err)
-                                                }
-                                        }
-                                        previousBeers = append(previousBeers, beer_list.Data[i].Name)
-                                        previousBeersURL = append(previousBeersURL, beer_list.Data[i].AbsoluteSiteLink)
-
-                                } else if (strings.Contains(previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)], "filler")) && (! strings.Contains(beer_list.Data[i].AbsoluteSiteLink, "filler")) {
-                                        beerUrl = beer_list.Data[i].AbsoluteSiteLink
-                                        previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)] = beerUrl
-                                        content = "<@&" + discord_sale_role_id + "> "+ beer_list.Data[i].Name + " is now for sale! " + beerUrl
-                                        message := discordwebhook.Message{
-                                                Username: &username,
-                                                Content: &content,
-                                        }
-
                                         err := discordwebhook.SendMessage(discordWebhookURL, message)
                                         if err != nil {
                                                 log.Println(err)
                                         }
                                 }
+                        }()
+
+                        res, getErr := beerClient.Do(req)
+                        if getErr != nil {
+                                log.Println(getErr)
+                                content = "<@" + discord_error_user + "> Error: " + getErr.Error()
+                                message := discordwebhook.Message{
+                                        Username: &username,
+                                        Content: &content,
+                                }
+                                err := discordwebhook.SendMessage(discordWebhookURL, message)
+                                if err != nil {
+                                        log.Println(err)
+                                }
+                                return
                         }
-                }
+
+                        if res.Body != nil {
+                                defer res.Body.Close()
+                        }
+
+                        body, readErr := ioutil.ReadAll(res.Body)
+                        if readErr != nil {
+                                log.Println(readErr)
+                        }
+
+                        beer_list := troonData{}
+                        jsonErr := json.Unmarshal(body, &beer_list)
+                        if jsonErr != nil {
+                                log.Println(jsonErr)
+                                content = "<@" + discord_error_user + "> Error: " + jsonErr.Error() + "\\n\\nJSON payload contents:\\n" + string(body[:])
+                                message := discordwebhook.Message{
+                                        Username: &username,
+                                        Content: &content,
+                                }
+                                err := discordwebhook.SendMessage(discordWebhookURL, message)
+                                if err != nil {
+                                        log.Println(err)
+                                }
+                        }
+                        //check to see if there is a beer for sale
+                        if len(beer_list.Data) > 0 {
+                                //loop through all beers in the list
+                                for i := 0; i < len(beer_list.Data); i++ {
+                                        //check to make sure we aren't alerting for the same beer
+                                        if ! slices.Contains(previousBeers, beer_list.Data[i].Name) {
+                                                beerUrl = beer_list.Data[i].AbsoluteSiteLink
+                                                content = "<@&" + discord_listing_role_id + "> "+ beer_list.Data[i].Name + " was just listed. (For sale probably later today.)"
+                                                message := discordwebhook.Message{
+                                                        Username: &username,
+                                                        Content: &content,
+                                                }
+                                                //don't send a discord alert if the bot is starting up
+                                                if startup == 0 {
+                                                        err := discordwebhook.SendMessage(discordWebhookURL, message)
+                                                        if err != nil {
+                                                                log.Println(err)
+                                                        }
+                                                }
+                                                previousBeers = append(previousBeers, beer_list.Data[i].Name)
+                                                previousBeersURL = append(previousBeersURL, beer_list.Data[i].AbsoluteSiteLink)
+
+                                        } else if (strings.Contains(previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)], "filler")) && (! strings.Contains(beer_list.Data[i].AbsoluteSiteLink, "filler")) {
+                                                beerUrl = beer_list.Data[i].AbsoluteSiteLink
+                                                previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)] = beerUrl
+                                                content = "<@&" + discord_sale_role_id + "> "+ beer_list.Data[i].Name + " is now for sale! " + beerUrl
+                                                message := discordwebhook.Message{
+                                                        Username: &username,
+                                                        Content: &content,
+                                                }
+
+                                                err := discordwebhook.SendMessage(discordWebhookURL, message)
+                                                if err != nil {
+                                                        log.Println(err)
+                                                }
+                                        }
+                                }
+                        }
+                }()
                 //start the timer and turn startup off
                 <-timer1.C
                 startup = 0
