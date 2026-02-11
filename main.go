@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -212,7 +213,12 @@ func main() {
 			}
 
 			if res.Body != nil {
-				defer res.Body.Close()
+				defer func(Body io.ReadCloser) {
+					err := Body.Close()
+					if err != nil {
+						log.Println(err)
+					}
+				}(res.Body)
 			}
 
 			body, readErr := ioutil.ReadAll(res.Body)
