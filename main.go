@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	cdnUrl                  = "https://cdn5.editmysite.com/app/store/api/v28/editor/users/131270493/sites/827516815791883917/products"
-	username                = "TroonBot"
-	discord_error_user      = ""
-	discordWebhookURL       = ""
-	discord_listing_role_id = ""
-	discord_sale_role_id    = ""
+	cdnUrl               = "https://cdn5.editmysite.com/app/store/api/v28/editor/users/131270493/sites/827516815791883917/products"
+	username             = "TroonBot"
+	discordErrorUser     = ""
+	discordWebhookURL    = ""
+	discordListingRoleId = ""
+	discordSaleRoleId    = ""
 )
 
 type troonData struct {
@@ -200,7 +200,7 @@ func main() {
 			defer func() {
 				if r := recover(); r != nil {
 					log.Println("panic during request loop:", r)
-					content = "<@" + discord_error_user + "> Error: panic during request loop: " + fmt.Sprint(r)
+					content = "<@" + discordErrorUser + "> Error: panic during request loop: " + fmt.Sprint(r)
 					message := discordwebhook.Message{
 						Username: &username,
 						Content:  &content,
@@ -215,7 +215,7 @@ func main() {
 			res, getErr := beerClient.Do(req)
 			if getErr != nil {
 				log.Println(getErr)
-				content = "<@" + discord_error_user + "> Error: " + getErr.Error()
+				content = "<@" + discordErrorUser + "> Error: " + getErr.Error()
 				message := discordwebhook.Message{
 					Username: &username,
 					Content:  &content,
@@ -240,7 +240,7 @@ func main() {
 			jsonErr := json.Unmarshal(body, &beer_list)
 			if jsonErr != nil {
 				log.Println(jsonErr)
-				content = "<@" + discord_error_user + "> Error: " + jsonErr.Error() + "\\n\\nJSON payload contents:\\n" + string(body[:])
+				content = "<@" + discordErrorUser + "> Error: " + jsonErr.Error() + "\\n\\nJSON payload contents:\\n" + string(body[:])
 				message := discordwebhook.Message{
 					Username: &username,
 					Content:  &content,
@@ -257,7 +257,7 @@ func main() {
 					//check to make sure we aren't alerting for the same beer
 					if !slices.Contains(previousBeers, beer_list.Data[i].Name) {
 						beerUrl = beer_list.Data[i].AbsoluteSiteLink
-						content = "<@&" + discord_listing_role_id + "> " + beer_list.Data[i].Name + " was just listed. (For sale probably later today.)"
+						content = "<@&" + discordListingRoleId + "> " + beer_list.Data[i].Name + " was just listed. (For sale probably later today.)"
 						message := discordwebhook.Message{
 							Username: &username,
 							Content:  &content,
@@ -275,7 +275,7 @@ func main() {
 					} else if (strings.Contains(previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)], "filler")) && (!strings.Contains(beer_list.Data[i].AbsoluteSiteLink, "filler")) {
 						beerUrl = beer_list.Data[i].AbsoluteSiteLink
 						previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)] = beerUrl
-						content = "<@&" + discord_sale_role_id + "> " + beer_list.Data[i].Name + " is now for sale! " + beerUrl
+						content = "<@&" + discordSaleRoleId + "> " + beer_list.Data[i].Name + " is now for sale! " + beerUrl
 						message := discordwebhook.Message{
 							Username: &username,
 							Content:  &content,
