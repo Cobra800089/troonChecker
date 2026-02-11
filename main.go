@@ -162,11 +162,20 @@ type troonData struct {
 	} `json:"meta"`
 }
 
+func sendDiscord(content string) {
+	msg := discordwebhook.Message{
+		Username: &username,
+		Content:  &content,
+	}
+	if err := discordwebhook.SendMessage(discordWebhookURL, msg); err != nil {
+		log.Printf("Error sending message: %v\n", err)
+	}
+}
+
 func main() {
 	previousBeers := []string{}
 	previousBeersURL := []string{}
 	var beerUrl = ""
-	var content = ""
 	var startup = 1
 
 	beerClient := http.Client{
@@ -180,16 +189,7 @@ func main() {
 
 	req.Header.Set("User-Agent", "troonChecker")
 
-	// Send discord message to show bot is online
-	content = "Troon bot is online"
-	message := discordwebhook.Message{
-		Username: &username,
-		Content:  &content,
-	}
-	discordErr := discordwebhook.SendMessage(discordWebhookURL, message)
-	if discordErr != nil {
-		log.Println(discordErr)
-	}
+	sendDiscord("Troon bot is online")
 
 	// loop forever while doing a check every minute
 	for {
@@ -200,30 +200,14 @@ func main() {
 			defer func() {
 				if r := recover(); r != nil {
 					log.Println("panic during request loop:", r)
-					content = "<@" + discordErrorUser + "> Error: panic during request loop: " + fmt.Sprint(r)
-					message := discordwebhook.Message{
-						Username: &username,
-						Content:  &content,
-					}
-					err := discordwebhook.SendMessage(discordWebhookURL, message)
-					if err != nil {
-						log.Println(err)
-					}
+					sendDiscord("<@" + discordErrorUser + "> Error: panic during request loop: " + fmt.Sprint(r))
 				}
 			}()
 
 			res, getErr := beerClient.Do(req)
 			if getErr != nil {
 				log.Println(getErr)
-				content = "<@" + discordErrorUser + "> Error: " + getErr.Error()
-				message := discordwebhook.Message{
-					Username: &username,
-					Content:  &content,
-				}
-				err := discordwebhook.SendMessage(discordWebhookURL, message)
-				if err != nil {
-					log.Println(err)
-				}
+				sendDiscord("<@" + discordErrorUser + "> Error: " + getErr.Error())
 				return
 			}
 
@@ -240,15 +224,7 @@ func main() {
 			jsonErr := json.Unmarshal(body, &beer_list)
 			if jsonErr != nil {
 				log.Println(jsonErr)
-				content = "<@" + discordErrorUser + "> Error: " + jsonErr.Error() + "\\n\\nJSON payload contents:\\n" + string(body[:])
-				message := discordwebhook.Message{
-					Username: &username,
-					Content:  &content,
-				}
-				err := discordwebhook.SendMessage(discordWebhookURL, message)
-				if err != nil {
-					log.Println(err)
-				}
+				sendDiscord("<@" + discordErrorUser + "> Error: " + jsonErr.Error() + "\\n\\nJSON payload contents:\\n" + string(body[:]))
 			}
 			//check to see if there is a beer for sale
 			if len(beer_list.Data) > 0 {
@@ -257,17 +233,9 @@ func main() {
 					//check to make sure we aren't alerting for the same beer
 					if !slices.Contains(previousBeers, beer_list.Data[i].Name) {
 						beerUrl = beer_list.Data[i].AbsoluteSiteLink
-						content = "<@&" + discordListingRoleId + "> " + beer_list.Data[i].Name + " was just listed. (For sale probably later today.)"
-						message := discordwebhook.Message{
-							Username: &username,
-							Content:  &content,
-						}
-						//don't send a discord alert if the bot is starting up
+						// Don't send a discord alert if the bot is starting up.
 						if startup == 0 {
-							err := discordwebhook.SendMessage(discordWebhookURL, message)
-							if err != nil {
-								log.Println(err)
-							}
+							sendDiscord("<@&" + discordListingRoleId + "> " + beer_list.Data[i].Name + " was just listed. (For sale probably later today.)")
 						}
 						previousBeers = append(previousBeers, beer_list.Data[i].Name)
 						previousBeersURL = append(previousBeersURL, beer_list.Data[i].AbsoluteSiteLink)
@@ -275,16 +243,7 @@ func main() {
 					} else if (strings.Contains(previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)], "filler")) && (!strings.Contains(beer_list.Data[i].AbsoluteSiteLink, "filler")) {
 						beerUrl = beer_list.Data[i].AbsoluteSiteLink
 						previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)] = beerUrl
-						content = "<@&" + discordSaleRoleId + "> " + beer_list.Data[i].Name + " is now for sale! " + beerUrl
-						message := discordwebhook.Message{
-							Username: &username,
-							Content:  &content,
-						}
-
-						err := discordwebhook.SendMessage(discordWebhookURL, message)
-						if err != nil {
-							log.Println(err)
-						}
+						sendDiscord("<@&" + discordSaleRoleId + "> " + beer_list.Data[i].Name + " is now for sale! " + beerUrl)
 					}
 				}
 			}
