@@ -220,30 +220,30 @@ func main() {
 				log.Println(readErr)
 			}
 
-			beer_list := troonData{}
-			jsonErr := json.Unmarshal(body, &beer_list)
+			beerList := troonData{}
+			jsonErr := json.Unmarshal(body, &beerList)
 			if jsonErr != nil {
 				log.Println(jsonErr)
 				sendDiscord("<@" + discordErrorUser + "> Error: " + jsonErr.Error() + "\\n\\nJSON payload contents:\\n" + string(body[:]))
 			}
 			//check to see if there is a beer for sale
-			if len(beer_list.Data) > 0 {
+			if len(beerList.Data) > 0 {
 				//loop through all beers in the list
-				for i := 0; i < len(beer_list.Data); i++ {
+				for i := 0; i < len(beerList.Data); i++ {
 					//check to make sure we aren't alerting for the same beer
-					if !slices.Contains(previousBeers, beer_list.Data[i].Name) {
-						beerUrl = beer_list.Data[i].AbsoluteSiteLink
+					if !slices.Contains(previousBeers, beerList.Data[i].Name) {
+						beerUrl = beerList.Data[i].AbsoluteSiteLink
 						// Don't send a discord alert if the bot is starting up.
 						if startup == 0 {
-							sendDiscord("<@&" + discordListingRoleId + "> " + beer_list.Data[i].Name + " was just listed. (For sale probably later today.)")
+							sendDiscord("<@&" + discordListingRoleId + "> " + beerList.Data[i].Name + " was just listed. (For sale probably later today.)")
 						}
-						previousBeers = append(previousBeers, beer_list.Data[i].Name)
-						previousBeersURL = append(previousBeersURL, beer_list.Data[i].AbsoluteSiteLink)
+						previousBeers = append(previousBeers, beerList.Data[i].Name)
+						previousBeersURL = append(previousBeersURL, beerList.Data[i].AbsoluteSiteLink)
 
-					} else if (strings.Contains(previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)], "filler")) && (!strings.Contains(beer_list.Data[i].AbsoluteSiteLink, "filler")) {
-						beerUrl = beer_list.Data[i].AbsoluteSiteLink
-						previousBeersURL[slices.Index(previousBeers, beer_list.Data[i].Name)] = beerUrl
-						sendDiscord("<@&" + discordSaleRoleId + "> " + beer_list.Data[i].Name + " is now for sale! " + beerUrl)
+					} else if (strings.Contains(previousBeersURL[slices.Index(previousBeers, beerList.Data[i].Name)], "filler")) && (!strings.Contains(beerList.Data[i].AbsoluteSiteLink, "filler")) {
+						beerUrl = beerList.Data[i].AbsoluteSiteLink
+						previousBeersURL[slices.Index(previousBeers, beerList.Data[i].Name)] = beerUrl
+						sendDiscord("<@&" + discordSaleRoleId + "> " + beerList.Data[i].Name + " is now for sale! " + beerUrl)
 					}
 				}
 			}
