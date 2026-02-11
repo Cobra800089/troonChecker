@@ -43,8 +43,8 @@ func sendDiscord(content string) {
 }
 
 func main() {
-	previousBeers := []string{}
-	previousBeersURL := []string{}
+	var previousBeers []string
+	var previousBeersURL []string
 	var beerUrl = ""
 	var startup = 1
 
