@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"slices"
@@ -90,9 +89,10 @@ func main() {
 				}(res.Body)
 			}
 
-			body, readErr := ioutil.ReadAll(res.Body)
-			if readErr != nil {
-				log.Println(readErr)
+			body, err := io.ReadAll(res.Body)
+			if err != nil {
+				log.Println(err)
+				return
 			}
 
 			beerList := troonData{}
