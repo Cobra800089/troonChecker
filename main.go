@@ -3,21 +3,24 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gtuk/discordwebhook"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/gtuk/discordwebhook"
 )
 
-var cdnUrl = "https://cdn5.editmysite.com/app/store/api/v28/editor/users/131270493/sites/827516815791883917/products"
-var username = "TroonBot"
-var discord_error_user = ""
-var discordWebhookURL = ""
-var discord_listing_role_id = ""
-var discord_sale_role_id = ""
+var (
+	cdnUrl                  = "https://cdn5.editmysite.com/app/store/api/v28/editor/users/131270493/sites/827516815791883917/products"
+	username                = "TroonBot"
+	discord_error_user      = ""
+	discordWebhookURL       = ""
+	discord_listing_role_id = ""
+	discord_sale_role_id    = ""
+)
 
 type troonData struct {
 	Data []struct {
